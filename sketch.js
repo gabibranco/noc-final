@@ -8,12 +8,6 @@
 // liveCell.liveNeighbors > 3 # dies
 // deadCell.liveNeighbors == 3 # becomes alive
 
-let soundFile;
-
-function preload() {
-  soundFile = loadSound('assets/alive1.mp3');
-}
-
 function make2DArray(cols, rows) {
   let arr = Array(cols);
   for (let i = 0; i < arr.length; i++) {
@@ -25,30 +19,32 @@ function make2DArray(cols, rows) {
 let grid;
 let cols;
 let rows;
-let resolution = 10;
+let resolution = 20;
 let res = resolution - 2;
 let slider;
 let sounds;
+let size = 500;
 
 function setup() {
-  createCanvas(windowWidth, 400);
-  
-  cols = floor(windowWidth / resolution);
-  rows = floor(400 / resolution);
+  createCanvas(size, size);
+
+  cols = floor(size / resolution);
+  rows = floor(size / resolution);
   slider = createSlider(2, 50, 15, 0.5);
-  slider.position((windowWidth - 200)/2, 430);
+  slider.position((size - 200)/2, (size + 30));
   slider.style('width', '200px');
-  
+
   grid = make2DArray(cols, rows);
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < cols; j++) {
-      grid[i][j] = 0;
+      grid[i][j] = floor(random(0,2));
     }
   }
+
   sounds = make2DArray(cols, rows);
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < cols; j++) {
-      sounds[i][j] = soundFile;
+      sounds[i][j] = new Sound();
     }
   }
 }
@@ -59,21 +55,24 @@ function draw() {
   background(255);
   noStroke();
   cursor(CROSS);
-  
-  
+
+
   let next = make2DArray(cols, rows);
-  
+
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < cols; j++) {
       let x = i * resolution;
       let y = j * resolution;
-      if (grid[i][j] == 1) {
-        fill(random(50,256), random(50,256), random(50, 256));
-        rect(x, y, res, res);
-      } else {
-        fill(30, 10, 100);
-        rect(x, y, res, res);
-        talk(i, j);
+      if (frameCount > 30) {
+        if (grid[i][j] == 1) {
+          fill(random(50,256), random(50,256), random(50, 256));
+          rect(x, y, res, res);
+          sounds[i][j].startLoop();
+        } else {
+          fill(30, 10, 100);
+          rect(x, y, res, res);
+          sounds[i][j].stopLoop();
+        }
       }
     }
   }
@@ -89,16 +88,15 @@ function draw() {
 
       if (state == 0 && neighbors == 3) {
         next[i][j] = 1;
-        talk(i, j);
       } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
         next[i][j] = 0;
-        sounds[i][j].pause();
+        // sounds[i][j].soundFile.pause();
       } else {
         next[i][j] = state;
       }
     }
   }
-  
+
   // Compute next cell generation based on grid
   grid = next;
 }
@@ -109,9 +107,8 @@ function mousePressed() {
       let x = i * resolution;
       let y = j * resolution;
       let d = dist(mouseX, mouseY, x, y)
-      if (d < resolution) {
+      if (d < resolution/2) {
         giveLife(i, j);
-        // has to play sound
       }
     }
   }
@@ -123,31 +120,18 @@ function countNeighbors(grid, x, y) {
     for (let j = -1; j < 2; j++) {
       let col = (x + i + cols) % cols;
       let row = (y + j + rows) % rows;
-      
-      
+
+
       sum += grid[col][row];
     }
   }
-  
+
   sum -= grid[x][y];
   return sum;
 }
 
 function giveLife(i, j) {
   grid[i][j] = 1;
-  sounds[i][j].loop(0, random(0.3,1.3), 1);
   // talk(i, j);
   // startTalking()
-}
-
-function kill(i, j) {
-  grid[i][j] = 0;
-  // soundFile.pause();
-  // talk(i, j);
-  
-  // stopTalking();
-}
-
-function talk(i, j) {
-  
 }
