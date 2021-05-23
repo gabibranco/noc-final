@@ -31,7 +31,7 @@ function setup() {
   cols = floor(size / resolution);
   rows = floor(size / resolution);
   slider = createSlider(2, 50, 15, 0.5);
-  slider.position((size - 200)/2, (size + 30));
+  slider.position("", (size + 30));
   slider.style('width', '200px');
 
   grid = make2DArray(cols, rows);
