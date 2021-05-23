@@ -109,6 +109,7 @@ function mousePressed() {
       let d = dist(mouseX, mouseY, x, y)
       if (d < resolution/2) {
         giveLife(i, j);
+        // has to play sound
       }
     }
   }
@@ -134,4 +135,16 @@ function giveLife(i, j) {
   grid[i][j] = 1;
   // talk(i, j);
   // startTalking()
+}
+
+function kill(i, j) {
+  grid[i][j] = 0;
+  // soundFile.pause();
+  // talk(i, j);
+
+  // stopTalking();
+}
+
+function talk(i, j) {
+
 }
